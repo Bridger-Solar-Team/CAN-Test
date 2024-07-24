@@ -15,8 +15,11 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  readInputs();
+}
 
+void readInputs() {
+  leftTurn = steeringData[0] & 0x01;
 }
 
 void readData(int packetSize) {
