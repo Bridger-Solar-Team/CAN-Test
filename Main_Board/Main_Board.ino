@@ -11,7 +11,7 @@ byte steeringData[8];
 void setup() {
   CAN.setPins (RX_GPIO_NUM, TX_GPIO_NUM);
   CAN.begin(500E3);
-  CAN.onReceive(readData);
+  CAN.onReceive(readCAN);
 }
 
 void loop() {
@@ -22,7 +22,7 @@ void readInputs() {
   leftTurn = steeringData[0] & 0x01;
 }
 
-void readData(int packetSize) {
+void readCAN(int packetSize) {
   int dataID = CAN.packetId();
   int position = 0;
   if(dataID == 0x20) {
