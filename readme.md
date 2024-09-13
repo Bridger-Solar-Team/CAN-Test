@@ -1,13 +1,14 @@
 ## Wiring
 Using ESP-32 Devkit C and a TJA1050 transceiver.
 This uses a simple voltage divider to bring the 5v signals
-from the TJA 1050 down to ESP-compatible 3.3v signals
+from the TJA1050 down to ESP-compatible 3.3v signals
 ```agsl
-5v --------- VCC
-Pin 5 ------> TX
-GND--2k-+-1k--RX
-Pin 4 <-+
-GND --------- GND
+ESP32      TJA1050
+5v ----------- VCC
+Pin 5 --------> TX
+GND--2k--+--1k--RX
+Pin 4 <--+
+GND ---------- GND
 ```
 Two ESP32-TJA1050 combos are wired up, and then connected purely by the CANH and CANL pins. 
 Each TJA1050 has a built-in 120 ohm termination resistor, so it works straight away
