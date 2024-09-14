@@ -2,12 +2,14 @@
 
 #define TX_GPIO_NUM 5
 #define RX_GPIO_NUM 4
+#define CANID 25
 
 int canData[8];
 int dataID;
+bool newCanData;
 
 //Assign one board as the sender and one(or multiple) not as the sender
-bool sender = false;
+bool sender = true;
 
 void setup() {
   //CAN setup
@@ -21,22 +23,27 @@ void setup() {
 }
 
 void loop() {
-  if(sender && millis()%1500 == 0){
+  if(sender){
     writeCAN();
-    Serial.println("CAN written");
+    Serial.print("CAN written at");
+    Serial.println(millis());
   }
-  if(!sender && millis()%1500 == 0){
+  if(!sender && newCanData){
     Serial.print("ID: ");
     Serial.println(dataID);
     for(int i = 0; i < 8; i++) {
+      Serial.print("Byte ");
+      Serial.print(i);
+      Serial.print(" : ");
       Serial.println(canData[i]);
     }
     Serial.println();
+    newCanData = false;
   }
 }
 
 void writeCAN() {
-  CAN.beginPacket(0x27);
+  CAN.beginPacket(CANID);
   CAN.write(0x01);
   CAN.write(0x02);
   CAN.write(0x04);
@@ -55,4 +62,5 @@ void readCAN(int packetSize) {
     canData[position] = CAN.read();
     position += 1;
   }
+  newCanData = true;
 }
