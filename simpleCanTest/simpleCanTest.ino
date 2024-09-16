@@ -4,7 +4,7 @@
 #define RX_GPIO_NUM 4
 #define CANID 25
 
-int canData[8];
+char canData[8];
 int dataID;
 bool newCanData;
 
@@ -25,10 +25,14 @@ void setup() {
 void loop() {
   if(sender){
     writeCAN();
-    Serial.print("CAN written at");
-    Serial.println(millis());
   }
   if(!sender && newCanData){
+    printCAN();
+    newCanData = false;
+  }
+}
+
+void printCAN() {
     Serial.print("ID: ");
     Serial.println(dataID);
     for(int i = 0; i < 8; i++) {
@@ -38,21 +42,20 @@ void loop() {
       Serial.println(canData[i]);
     }
     Serial.println();
-    newCanData = false;
-  }
 }
 
 void writeCAN() {
-  CAN.beginPacket(CANID);
-  CAN.write(0x01);
-  CAN.write(0x02);
-  CAN.write(0x04);
-  CAN.write(0x08);
-  CAN.write(0x10);
-  CAN.write(0x20);
-  CAN.write(0x40);
-  CAN.write(0x80);
-  CAN.endPacket();
+  if(Serial.available() > 0){
+    CAN.beginPacket(CANID);
+    for(int i = 0; i < 8; i++){
+      if(Serial.available() > 0){
+        CAN.write(Serial.read());
+      }
+    }
+    CAN.endPacket();
+    Serial.print("CAN written at");
+    Serial.println(millis());
+  }
 }
 
 void readCAN(int packetSize) {
