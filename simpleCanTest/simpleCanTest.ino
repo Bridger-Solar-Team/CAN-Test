@@ -9,7 +9,7 @@ int dataID;
 bool newCanData;
 
 //Assign one board as the sender and one(or multiple) not as the sender
-bool sender = true;
+bool sender = false;
 
 void setup() {
   //CAN setup
@@ -23,23 +23,25 @@ void setup() {
 }
 
 void loop() {
-  if(sender){
-    writeCAN();
-  }
-  if(!sender && newCanData){
+  // if(sender){
+  //   writeCAN();
+  // }
+  // if(!sender && newCanData){
+  //   printCAN();
+  //   newCanData = false;
+  // }
+  writeCAN();
+  if(newCanData) {
     printCAN();
     newCanData = false;
   }
 }
 
 void printCAN() {
-    Serial.print("ID: ");
-    Serial.println(dataID);
+    Serial.print(dataID);
+    Serial.print(": ");
     for(int i = 0; i < 8; i++) {
-      Serial.print("Byte ");
-      Serial.print(i);
-      Serial.print(" : ");
-      Serial.println(canData[i]);
+      Serial.print(canData[i]);
     }
     Serial.println();
 }
@@ -53,17 +55,19 @@ void writeCAN() {
       }
     }
     CAN.endPacket();
-    Serial.print("CAN written at");
+    Serial.print("CAN written at ");
     Serial.println(millis());
   }
 }
 
 void readCAN(int packetSize) {
   dataID = CAN.packetId();
-  int position = 0;
-  while(CAN.available()) {
-    canData[position] = CAN.read();
-    position += 1;
+  for(int i = 0; i < 8; i++) {
+    if(CAN.available()) {
+      canData[i] = CAN.read();
+    } else {
+      canData[i] = 0;
+    }
   }
   newCanData = true;
 }
