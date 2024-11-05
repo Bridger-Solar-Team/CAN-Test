@@ -12,10 +12,18 @@
 #define PIN_4 14
 #define PIN_5 33
 
+//Keep track of CAN receiving messages
 char canData[8];
 int dataID;
 bool newCanData;
+
+//Store pin state data
 bool pins[6];
+int pinsCanSpacing = 50; //Time between CAN frames in milliseconds
+unsigned long pinsCanTime = 0;
+
+//Used for LCD CAN message printing
+bool row = false;
 
 //Assign one board as the sender and one(or multiple) not as the sender
 bool sender = false;
@@ -46,7 +54,15 @@ void setup() {
 }
 
 void loop() {
-  writeCAN();
+  updatePins();
+
+  if(millis() - pinsCanTime > pinsCanSpacing) {
+    pinsCAN();
+    pinsCantime = millis();
+  }
+
+  serialCAN();
+
   if (newCanData) {
     printCAN();
     lcdCAN();
@@ -54,27 +70,32 @@ void loop() {
   }
 }
 
-bool buttonChanged() {
-  bool changed = false;
-  if (digitalRead(PIN_1) != pins[0]) {
-    pins[0] = digitalRead(PIN_0);
-    Serial.println("Pin 0: " + (60+pins[0]));
-    changed = true;
+void pinsCAN() {
+    CAN.beginPacket(CANID + 1);
+    for (int i = 0; i < 6; i++) {
+      CAN.write(48 + pins[i]);
+    }
+    CAN.endPacket();
+    Serial.print("Pins written at ");
+    Serial.println(millis());
   }
-  if (digitalRead(PIN_2) != pins[1]) {
-    pins[1] = digitalRead(PIN_1);
-    Serial.println("Pin 1: " + (60+pins[1]));
-    changed = true;
-  }
-  return changed;
+}
+
+void updatePins() {
+  pins[0] = digitalRead(PIN_0);
+  pins[1] = digitalRead(PIN_1);
+  pins[2] = digitalRead(PIN_2);
+  pins[3] = digitalRead(PIN_3);
+  pins[4] = digitalRead(PIN_4);
+  pins[5] = digitalRead(PIN_5);
 }
 
 void lcdCAN() {
-  lcd.clear();
-  lcd.setCursor(0, 0);
+  lcd.setCursor(row*1, 0);
   lcd.print(dataID);
   lcd.print(":");
   lcd.print(canData);
+  row = !row;
 }
 
 void printCAN() {
@@ -86,7 +107,7 @@ void printCAN() {
   Serial.println();
 }
 
-void writeCAN() {
+void serialCAN() {
   if (Serial.available() > 0) {
     CAN.beginPacket(CANID);
     for (int i = 0; i < 8; i++) {
@@ -95,18 +116,9 @@ void writeCAN() {
       }
     }
     CAN.endPacket();
-    Serial.print("CANboard written at ");
+    Serial.print("serialCAN written at ");
     Serial.println(millis());
   } 
-  else if (buttonChanged()) {
-    CAN.beginPacket(CANID + 1);
-    for (int i = 0; i < 6; i++) {
-      CAN.write(48 + pins[i]);
-    }
-    CAN.endPacket();
-    Serial.print("Pins written at ");
-    Serial.println(millis());
-  }
 }
 
 void readCAN(int packetSize) {
