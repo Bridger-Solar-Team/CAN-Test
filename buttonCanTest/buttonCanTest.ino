@@ -19,7 +19,7 @@ bool newCanData;
 
 //Store pin state data
 bool pins[6];
-int pinsCanSpacing = 50; //Time between CAN frames in milliseconds
+int pinsCanSpacing = 1000; //Time between CAN frames in milliseconds
 unsigned long pinsCanTime = 0;
 
 //Used for LCD CAN message printing
@@ -58,7 +58,7 @@ void loop() {
 
   if(millis() - pinsCanTime > pinsCanSpacing) {
     pinsCAN();
-    pinsCantime = millis();
+    pinsCanTime = millis();
   }
 
   serialCAN();
@@ -71,14 +71,13 @@ void loop() {
 }
 
 void pinsCAN() {
-    CAN.beginPacket(CANID + 1);
-    for (int i = 0; i < 6; i++) {
-      CAN.write(48 + pins[i]);
-    }
-    CAN.endPacket();
-    Serial.print("Pins written at ");
-    Serial.println(millis());
+  CAN.beginPacket(CANID + 1);
+  for (int i = 0; i < 6; i++) {
+    CAN.write(48 + pins[i]);
   }
+  CAN.endPacket();
+  Serial.print("Pins written at ");
+  Serial.println(millis());
 }
 
 void updatePins() {
