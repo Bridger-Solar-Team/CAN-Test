@@ -55,16 +55,18 @@ void loop() {
 }
 
 bool buttonChanged() {
+  bool changed = false;
   if (digitalRead(PIN_1) != pins[0]) {
     pins[0] = digitalRead(PIN_1);
     Serial.println("Pin 1: " + pins[0]);
-    return true;
-  } else if (digitalRead(PIN_2) != pins[1]) {
+    changed = true;
+  }
+  if (digitalRead(PIN_2) != pins[1]) {
     pins[1] = digitalRead(PIN_2);
     Serial.println("Pin 2: " + pins[1]);
-    return true;
+    changed = true;
   }
-  return false;
+  return changed;
 }
 
 void lcdCAN() {
