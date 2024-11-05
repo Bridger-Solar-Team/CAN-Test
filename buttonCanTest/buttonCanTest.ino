@@ -5,12 +5,12 @@
 #define RX_GPIO_NUM 4
 #define CANID 25
 
-#define PIN_1 25
-#define PIN_2 26
-#define PIN_3 27
-#define PIN_4 32
-#define PIN_5 14
-#define PIN_6 33
+#define PIN_0 25
+#define PIN_1 26
+#define PIN_2 27
+#define PIN_3 32
+#define PIN_4 14
+#define PIN_5 33
 
 char canData[8];
 int dataID;
@@ -37,12 +37,12 @@ void setup() {
   lcd.backlight();
 
   //Pins setup
+  pinMode(PIN_0, INPUT_PULLDOWN);
   pinMode(PIN_1, INPUT_PULLDOWN);
   pinMode(PIN_2, INPUT_PULLDOWN);
   pinMode(PIN_3, INPUT_PULLDOWN);
   pinMode(PIN_4, INPUT_PULLDOWN);
   pinMode(PIN_5, INPUT_PULLDOWN);
-  pinMode(PIN_6, INPUT_PULLDOWN);
 }
 
 void loop() {
@@ -57,13 +57,13 @@ void loop() {
 bool buttonChanged() {
   bool changed = false;
   if (digitalRead(PIN_1) != pins[0]) {
-    pins[0] = digitalRead(PIN_1);
-    Serial.println("Pin 1: " + pins[0]);
+    pins[0] = digitalRead(PIN_0);
+    Serial.println("Pin 0: " + (60+pins[0]));
     changed = true;
   }
   if (digitalRead(PIN_2) != pins[1]) {
-    pins[1] = digitalRead(PIN_2);
-    Serial.println("Pin 2: " + pins[1]);
+    pins[1] = digitalRead(PIN_1);
+    Serial.println("Pin 1: " + (60+pins[1]));
     changed = true;
   }
   return changed;
