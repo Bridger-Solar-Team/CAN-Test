@@ -90,7 +90,7 @@ void updatePins() {
 }
 
 void lcdCAN() {
-  lcd.setCursor(row*1, 0);
+  lcd.setCursor(0, row*1);
   lcd.print(dataID);
   lcd.print(":");
   lcd.print(canData);
