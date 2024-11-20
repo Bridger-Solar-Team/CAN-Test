@@ -20,7 +20,7 @@ unsigned long pinsCanTime = 0;
 void setup() {
   //CAN setup
   CAN.setPins(RX_GPIO_NUM, TX_GPIO_NUM);
-  CAN.begin(500E3);
+  CAN.begin(500E3); // Supported speeds are 125E3, 250E3, 500E3, 1000E3
   CAN.onReceive(readCAN);
 
   //Serial setup
@@ -63,8 +63,8 @@ void pinsCAN() {
 
 void updatePins() {
   pins[0] = digitalRead(PIN_0);
-  Serial.print("Pin 0 is");
-  Serial.println(pins[0]);
+  // Serial.print("Pin 0 is");
+  // Serial.println(pins[0]);
 }
 
 void printCAN() {
