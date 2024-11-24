@@ -4,8 +4,9 @@
 #define RX_GPIO_NUM 4
 #define CANID 25
 
-#define PIN_0 25
-#define PIN_1 2
+#define PIN_0 25 //Button pin
+
+#define PIN_1 2 //Internal LED pin
 
 //Keep track of CAN receiving messages
 char canData[8];
@@ -34,7 +35,6 @@ void setup() {
 
 void loop() {
   updatePins();
-  ledCAN();
 
   if(millis() - pinsCanTime > pinsCanSpacing) {
     pinsCAN();
@@ -43,6 +43,7 @@ void loop() {
 
   if (newCanData) {
     printCAN();
+    ledCAN();
     newCanData = false;
   }
 }
@@ -63,8 +64,6 @@ void pinsCAN() {
 
 void updatePins() {
   pins[0] = digitalRead(PIN_0);
-  // Serial.print("Pin 0 is");
-  // Serial.println(pins[0]);
 }
 
 void printCAN() {
