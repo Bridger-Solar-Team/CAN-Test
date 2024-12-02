@@ -1,78 +1,107 @@
+//Libraries
 #include <CAN.h>
-#include <SD.h>
-#include <SPI.h>
 
+//Board Specific Contants
+double STEERING_CAN_ID = 0b01011 << 24 && 0b00001000 << 16 && 12;
+int canWriteSpacing = 50; //Time between CAN frames in milliseconds
+unsigned long canWriteTime = 0;
+
+//Pin Locations for Board
 #define TX_GPIO_NUM 5
 #define RX_GPIO_NUM 4
-#define RIGHT_TURN_PIN 8
-#define LEFT_TURN_PIN 9
-#define CHIP_SELECT_PIN 10
-#define STEERING_CAN_ID 0x12
-#define CONTROL_CAN_ID 0x11 //must be less than 0x800 (2^11 in hex)
-#define THROTTLE_PIN 11
 
-int accel;
-bool leftTurn;
-bool rightTurn;
-uint8_t canData[8];
-File dataFile;
-String dataString;
-byte controlData[8];
+//Pin Locations for GPIO
+#define HV_POWER_PIN 20
+#define LEFT_TURN_PIN 21
+#define RIGHT_TURN_PIN 22
+#define HORN_PIN 23
+#define FORWARD_REVERSE_PIN 24
+#define DISPLAY_TOGGLE_PIN 25
+#define HAZZARDS_PIN 26
+#define CRUISE_CONTROL_PIN 27
+#define THROTTLE_PIN 28
+
+//Variables
+double accel = 0;
+bool newCanData = false;
+double dataID;
+
+//Arrays
+byte canData[4][8];
+byte canMessage[8];
+bool pins[8];
 
 void setup() {
   CAN.setPins(RX_GPIO_NUM, TX_GPIO_NUM);
-  CAN.begin(500E3);
+  CAN.begin(1000E3);
   CAN.onReceive(readCAN);
 
-  SD.begin();
-  dataFile = SD.open("data.txt", FILE_WRITE);
-
-  pinMode(RIGHT_TURN_PIN, INPUT);
-  pinMode(LEFT_TURN_PIN, INPUT);
-  pinMode(THROTTLE_PIN, INPUT);
-  pinMode(CHIP_SELECT_PIN, OUTPUT);
+  pinMode(HV_POWER_PIN, INPUT_PULLDOWN);
+  pinMode(LEFT_TURN_PIN, INPUT_PULLDOWN);
+  pinMode(RIGHT_TURN_PIN, INPUT_PULLDOWN);
+  pinMode(HORN_PIN, INPUT_PULLDOWN);
+  pinMode(FORWARD_REVERSE_PIN, INPUT_PULLDOWN);
+  pinMode(DISPLAY_TOGGLE_PIN, INPUT_PULLDOWN);
+  pinMode(HAZZARDS_PIN, INPUT_PULLDOWN);
+  pinMode(CRUISE_CONTROL_PIN, INPUT_PULLDOWN);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  writeCAN();
   readInputs();
-  logData();
-}
 
-void logData() {
-  dataString += leftTurn;
-  dataString += rightTurn;
-  dataString += ",";
-  dataString += 
-  dataFile.println(dataString);
-  dataString = "";
+  if(millis() - canWriteTime > canWriteSpacing) {
+    writeCAN();
+    canWriteTime = millis();
+  }
+
 }
 
 void readInputs() {
-  leftTurn = digitalRead(LEFT_TURN_PIN);
-  rightTurn = digitalRead(RIGHT_TURN_PIN);
+  pins[7] = digitalRead(HV_POWER_PIN);
+  pins[6] = digitalRead(LEFT_TURN_PIN);
+  pins[5] = digitalRead(RIGHT_TURN_PIN);
+  pins[4] = digitalRead(HORN_PIN);
+  pins[3] = digitalRead(FORWARD_REVERSE_PIN);
+  pins[2] = digitalRead(DISPLAY_TOGGLE_PIN);
+  pins[1] = digitalRead(HAZZARDS_PIN);
+  pins[0] = digitalRead(CRUISE_CONTROL_PIN);
+
   accel = analogRead(THROTTLE_PIN)/4095.0;
 }
 
 void readCAN(int packetSize) {
-  int dataID = CAN.packetId();
-  int position = 0;
-  if(dataID == CONTROL_CAN_ID) {
-    while(CAN.available()) {
-      controlData[position] = CAN.read();
-      position += 1;
+  //Tell code wehre to write CAN data
+  dataID = CAN.packetId();
+  int j = 0;
+  if(dataID == 0x0B080019) {
+    j = 1;
+  }
+
+  //Write and store CAN data
+  for (int i = 0; i < 8; i++) {
+    if (CAN.available()) {
+      canData[j][i] = CAN.read();
+    } else {
+      canData[j][i] = 0;
     }
   }
+
+  //If anything acts on new CAN data
+  newCanData = true;
 }
 
 void writeCAN() {
-  canData[0] += leftTurn;
-  canData[0] += rightTurn << 1;
-  canData[1] = accel*255;
+  //Prep message array
+  for(int i  = 0; i < 8; i++) {
+    canMessage[0] += pins[i] << i;
+  }
 
+  canMessage[1] = accel*255.0;
+
+  //Send message
   CAN.beginPacket(STEERING_CAN_ID);
-  CAN.write(canData,8);
+  CAN.write(canMessage,8);
   CAN.endPacket();
 
 }

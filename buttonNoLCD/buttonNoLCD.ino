@@ -81,7 +81,7 @@ void readCAN(int packetSize) {
     if (CAN.available()) {
       canData[i] = CAN.read();
     } else {
-      canData[i] = 32;
+      canData[i] = 0;
     }
   }
   newCanData = true;
