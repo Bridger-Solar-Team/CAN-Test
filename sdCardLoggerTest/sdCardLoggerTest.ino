@@ -4,7 +4,8 @@
 #define CHIP_SELECT_PIN 17
 #define ODD_PIN_BEHAVIOUR 5
 
-String dataString;
+String dataString = "";
+int cacheCount = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -28,25 +29,36 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  logData();
-  delay(1000);
+
+  cacheData();
+  if(cacheCount >= 10){
+    logData();
+  }
+  delay(100);
+}
+
+void cacheData() {
+  dataString += "Time: ";
+  dataString += millis();
+  dataString += ", Number: ";
+  dataString += cacheCount;
+  dataString += "\n";
+  cacheCount++;
 }
 
 void logData() {
-  dataString += "Current Time: ";
-  dataString += millis();
 
   File dataFile;
   dataFile = SD.open("/data.txt", FILE_APPEND);
-  if (!dataFile) {
+  if (!dataFile) { 
     Serial.println("FAILED TO OPEN FILE TO WRITE");
   } else {
     dataFile.println(dataString);
     dataFile.close();
-
-    Serial.print(dataString);
+    //Serial.println("wrote");
+    //Serial.print(dataString);
   }
 
   dataString = "";
+  cacheCount = 0;
 }
