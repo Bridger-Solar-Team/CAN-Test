@@ -9,31 +9,6 @@ void printCAN() {
   }
 }
 
-void sendCanData() {
-  if(millis() - pinsCanTime > pinsCanSpacing) {
-    //Can Frame Prep Code
-    byte canFrame[8];
-    canFrame[1] += powerOn << 7;
-    canFrame[1] += leftTurn << 6;
-    canFrame[1] += rightTurn << 5;
-    canFrame[1] += horn << 4;
-    canFrame[1] += fwdRev << 3;
-    canFrame[1] += dispToggle << 2;
-    canFrame[1] += hazzards << 1;
-    canFrame[1] += cruiseControl;
-    canFrame[2] = throttle*200.0;
-
-    //Can Frame Code
-    CAN.beginPacket(DASH_CANID);
-    for (int i = 0; i < 8; i++) {
-      CAN.write(canFrame[i]);
-    }
-    CAN.endPacket();
-    //End Can Frame Code
-    pinsCanTime = millis();
-  }
-}
-
 void updateCarFromCanInfo() {
   //From the dash board
   // powerOn = canData[1][1] && 0b10000000;

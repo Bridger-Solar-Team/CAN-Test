@@ -1,6 +1,7 @@
 //The last number in the CAN ID is 12 for the dash baord,
   //25 for the battery box board, 11 for the data logging board,
   //and 30 for the BMS
+#define CANID (11 << 24) + (8 << 16) + (0 << 6) + (0)
 #define DASH_CANID (11 << 24) + (8 << 16) + (0 << 6) + (12)
 #define BATTERYBOX_CANID (11 << 24) + (8 << 16) + (0 << 6) + (25)
 #define LOGGER_CANID (11 << 24) + (8 << 16) + (0 << 6) + (14)
@@ -30,13 +31,3 @@
 #define PWR3 25
 #define PWR4 27
 #define PWR5 15
-
-bool powerOn;
-bool leftTurn;
-bool rightTurn;
-bool horn;
-bool fwdRev;
-bool dispToggle;
-bool hazzards;
-bool cruiseControl;
-int throttle;
