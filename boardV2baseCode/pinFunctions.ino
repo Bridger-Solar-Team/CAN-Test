@@ -38,5 +38,6 @@ void updateCarFromPins() {
   dispToggle = pins[6]%2;
   hazzards = pins[7]%2;
   cruiseControl = pins[8]%2;
+  brakePressed = pins[9]%2;
   throttle = pins[12]/4095.0;
 }

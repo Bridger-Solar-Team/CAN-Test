@@ -31,6 +31,9 @@
 #define PWR4 27
 #define PWR5 15
 
+#define DCL_WARNING_SETPOINT 20
+#define CCL_WARNING_SETPOINT 30
+
 bool powerOn;
 bool leftTurn;
 bool rightTurn;
@@ -39,4 +42,20 @@ bool fwdRev;
 bool dispToggle;
 bool hazzards;
 bool cruiseControl;
+bool brakePressed;
 int throttle;
+
+int batteryVoltageLV;
+int workingvoltageLV;
+
+bool sdFailure;
+
+int soc;
+int dcl;
+int ccl;
+int currentDraw;
+bool overCurrent;
+bool overCharge;
+bool overDischarge;
+bool bmsFailure;
+bool overTemp;

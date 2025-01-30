@@ -21,7 +21,7 @@ void sendCanData() {
     canFrame[1] += dispToggle << 2;
     canFrame[1] += hazzards << 1;
     canFrame[1] += cruiseControl;
-    canFrame[2] = throttle*200.0;
+    canFrame[3] = throttle*200.0;
 
     //Can Frame Code
     CAN.beginPacket(DASH_CANID);
@@ -44,7 +44,7 @@ void updateCarFromCanInfo() {
   // dispToggle = canData[1][1] && 0b00000100;
   // hazzards = canData[1][1] && 0b00000010;
   // cruiseControl = canData[1][1] && 0b00000001;
-  // throttle = canData[1][2]/200.0;
+  // throttle = canData[1][3]/200.0;
 
   //From the battery box board
   batteryVoltageLV = canData[2][1]/10.0;
@@ -56,7 +56,7 @@ void updateCarFromCanInfo() {
   //From the BMS
   soc = canData[4][1]/200.0;
   dcl = canData[4][2]/2.0;
-  dcl = canData[4][3]/2.0;
+  ccl = canData[4][3]/2.0;
   currentDraw = canData[4][4]/2.0;
   overCurrent = canData[4][5] && 0b10000000;
   overCharge = canData[4][5] && 0b01000000;

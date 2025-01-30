@@ -29,7 +29,6 @@ void setup() {
   lcd.backlight();
 
   setupPins();
-
 }
 
 void loop() {
